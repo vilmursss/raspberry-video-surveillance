@@ -1,0 +1,1 @@
+This project aims to build a lightweight and secure video surveillance system using a Raspberry Pi and its official camera module. The system leverages the Yocto Project to generate a minimal and custom Linux-based root filesystem (rootfs) tailored specifically for the Raspberry Pi platform.
