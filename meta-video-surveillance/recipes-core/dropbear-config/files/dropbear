@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    start)
+        echo "Starting Dropbear SSH server..."
+        /usr/sbin/dropbear -r /etc/dropbear/dropbear_rsa_host_key
+        ;;
+    stop)
+        echo "Stopping Dropbear SSH server..."
+        killall dropbear
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0
