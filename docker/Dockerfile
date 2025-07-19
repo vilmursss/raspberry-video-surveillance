@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     file \
     lz4 \
     zstd \
+    sudo \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,4 +38,21 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
+# Ubuntu has own user 'ubuntu' at least since 24.04.
+# Therefore, in order to use our own 'yoctouser'
+# we first must remove the 'ubuntu' user.
+RUN userdel -r ubuntu
+
+# *** Non-root user setup ***
+ARG USERNAME=yoctouser
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER $USERNAME
+
+# Set the main working directory
 WORKDIR /workdir

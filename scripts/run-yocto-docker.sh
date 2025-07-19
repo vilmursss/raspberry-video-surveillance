@@ -4,9 +4,8 @@ set -e
 YOCTO_WORKDIR="/mnt/lacie/yocto-raspberry"
 BUILD_DIR="${YOCTO_WORKDIR}/build"
 EXTERNAL_LAYERS="${YOCTO_WORKDIR}/external-layers"
-POKY_PATH="${EXTERNAL_LAYERS}/poky"
 
-mkdir -p "$BUILD_DIR" "$EXTERNAL_LAYERS"
+mkdir -p "$YOCTO_WORKDIR" "$BUILD_DIR" "$EXTERNAL_LAYERS"
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
@@ -20,4 +19,5 @@ docker run -it --rm \
   yocto-builder \
   bash -c "bash /workdir/scripts/setup-external-layers.sh && \
            source $EXTERNAL_LAYERS/poky/oe-init-build-env $BUILD_DIR && \
+           bash /workdir/scripts/post-source-actions.sh && \
            exec bash"
