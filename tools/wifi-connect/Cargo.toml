@@ -1,10 +1,10 @@
 [package]
-name = "network"
+name = "wifi-connect"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "network"
+name = "wifi_connect"
 path = "src/lib.rs"
 
 [dependencies]
@@ -13,5 +13,5 @@ path = "src/lib.rs"
 tempfile = "3.8"
 
 [[bin]]
-name = "network"
+name = "wifi-connect"
 path = "src/main.rs"

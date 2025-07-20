@@ -1,5 +1,5 @@
 use std::env;
-use network::{verify_args, write_result_to_usb};
+use wifi_connect::{verify_args, write_result_to_usb};
 
 fn main() {
     let args: Vec<String> = env::args().collect();

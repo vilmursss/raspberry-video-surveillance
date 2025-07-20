@@ -2,7 +2,7 @@ use std::fs;
 use std::io::Read;
 use tempfile::TempDir;
 
-use network::{verify_args, write_result_to_usb};
+use wifi_connect::{verify_args, write_result_to_usb};
 
 #[test]
 fn test_verify_args_insufficient_arguments() {
