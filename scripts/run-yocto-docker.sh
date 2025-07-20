@@ -1,13 +1,12 @@
 #!/bin/bash
 set -e
 
+PROJECT_ROOT=$(git rev-parse --show-toplevel)
 YOCTO_WORKDIR="/mnt/lacie/yocto-raspberry"
 BUILD_DIR="${YOCTO_WORKDIR}/build"
 EXTERNAL_LAYERS="${YOCTO_WORKDIR}/external-layers"
 
 mkdir -p "$YOCTO_WORKDIR" "$BUILD_DIR" "$EXTERNAL_LAYERS"
-
-PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
 docker build -f "$PROJECT_ROOT/docker/Dockerfile" -t yocto-builder "$PROJECT_ROOT/docker"
 
@@ -17,7 +16,15 @@ docker run -it --rm \
   --workdir /workdir \
   --name yocto-dev \
   yocto-builder \
-  bash -c "bash /workdir/scripts/setup-external-layers.sh && \
-           source $EXTERNAL_LAYERS/poky/oe-init-build-env $BUILD_DIR && \
-           bash /workdir/scripts/post-source-actions.sh && \
-           exec bash"
+  bash -c '
+    export EXTERNAL_LAYERS="'"$EXTERNAL_LAYERS"'"
+    export BUILD_DIR="'"$BUILD_DIR"'"
+    bash /workdir/scripts/setup-external-layers.sh &&
+    source $EXTERNAL_LAYERS/poky/oe-init-build-env $BUILD_DIR &&
+    bash /workdir/scripts/post-source-actions.sh &&
+    if [ $# -eq 0 ]; then
+      exec bash
+    else
+      "$@"
+    fi
+  ' -- "$@"
