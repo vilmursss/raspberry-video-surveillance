@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source $VOLUME_WORKDIR/conf/build.conf
+
 # Most recent (scarthgap) poky tag commit at 18.7.2025
 POKY_TAG="ac257900c33754957b2696529682029d997a8f28"
 
@@ -10,7 +12,7 @@ RASPBERRY_TAG="48452445d779b0f69bf1ead12b3850d50eb8920d"
 # most recent scarthgap commit at 18.7.2025
 OE_TAG="e8fd97d86af86cdcc5a6eb3f301cbaf6a2084943"
 
-EXTLAYERS_DIR="/mnt/lacie/yocto-raspberry/external-layers"
+EXTLAYERS_DIR="$YOCTO_WORKDIR/external-layers"
 
 LAYER_REPOS=(
     "https://git.yoctoproject.org/git/poky.git poky $POKY_TAG"

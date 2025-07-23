@@ -53,6 +53,3 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER $USERNAME
-
-# Set the main working directory
-WORKDIR /workdir

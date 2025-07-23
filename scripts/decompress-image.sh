@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e
 
-if [ ! -d /mnt/tmp ]; then
-    echo "/mnt/tmp does not exist. Tmp needs to be mounted first."
+source $(git rev-parse --show-toplevel)/conf/build.conf
+
+if [ ! -d $IMAGE_DECOMPRESSED_DIR ]; then
+    echo "$IMAGE_DECOMPRESSED_DIR does not exist. Please create directory first."
     exit 1
 fi
 
-bzcat /mnt/lacie/yocto-raspberry/build/tmp/deploy/images/raspberrypi3/core-image-minimal-raspberrypi3.rootfs.wic.bz2 > /mnt/tmp/core-image-minimal-raspberrypi3.rootfs.wic
+bzcat $YOCTO_BUILD_DIR/tmp/deploy/images/raspberrypi3/core-image-minimal-raspberrypi3.rootfs.wic.bz2 > $IMAGE_DECOMPRESSED_DIR/core-image-minimal-raspberrypi3.rootfs.wic
 
-echo "Image decompressed to /mnt/tmp/core-image-minimal-raspberrypi3.rootfs.wic"
+echo "Image decompressed to $IMAGE_DECOMPRESSED_DIR/core-image-minimal-raspberrypi3.rootfs.wic"
