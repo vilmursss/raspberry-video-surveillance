@@ -37,4 +37,33 @@ pub fn write_result_to_usb(mount_dir: &str, result: &str) -> bool {
         }
     }
     return true;
-} 
+}
+
+pub fn verify_usb_content(path: &str) -> bool {
+    let conf_path = Path::new(path).join("wpa_supplicant.conf");
+    return conf_path.exists() && conf_path.is_file()
+}
+
+pub fn copy_file(src: &str, dst: &str) -> bool {
+    let dst_file_path = Path::new(dst);
+    use std::fs;
+
+    let src_file_path = Path::new(src);
+
+    match fs::copy(&src_file_path, &dst_file_path) {
+        Ok(_) => {
+            println!(
+                "Successfully copied {:?} to {:?}",
+                src_file_path, dst_file_path
+            );
+            return true
+        }
+        Err(e) => {
+            eprintln!(
+                "Failed to copy {:?} to {:?}: {}",
+                src_file_path, dst_file_path, e
+            );
+            return false
+        }
+    }
+}

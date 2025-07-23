@@ -2,7 +2,7 @@ use std::fs;
 use std::io::Read;
 use tempfile::TempDir;
 
-use wifi_connect::{verify_args, write_result_to_usb};
+use wifi_connect::{verify_args, write_result_to_usb, verify_usb_content, copy_file};
 
 #[test]
 fn test_verify_args_insufficient_arguments() {
@@ -100,4 +100,78 @@ fn test_write_result_to_usb_nonexistent_directory() {
     let test_message = "This should fail";
 
     assert_eq!(write_result_to_usb(nonexistent_path, test_message), false);
+}
+
+#[test]
+fn test_verify_usb_content_existing_file() {
+    let temp_dir = TempDir::new().unwrap();
+    let wpa_conf_file = temp_dir.path().join("wpa_supplicant.conf");
+    
+    fs::write(&wpa_conf_file, "network={\n    ssid=\"TestNetwork\"\n    psk=\"password123\"\n}").unwrap();
+    
+    let path = temp_dir.path().to_string_lossy();
+    assert_eq!(verify_usb_content(&path), true);
+}
+
+#[test]
+fn test_verify_usb_content_missing_file() {
+    let temp_dir = TempDir::new().unwrap();
+    let path = temp_dir.path().to_string_lossy();
+    
+    assert_eq!(verify_usb_content(&path), false);
+}
+
+#[test]
+fn test_copy_file_success() {
+    let temp_dir = TempDir::new().unwrap();
+    
+    let source_file = temp_dir.path().join("test_file.txt");
+    let test_content = "Test content";
+    fs::write(&source_file, test_content).unwrap();
+    
+    let target_file = temp_dir.path().join("target_file.txt");
+    
+    let source_path = source_file.to_string_lossy();
+    let target_path = target_file.to_string_lossy();
+    
+    assert_eq!(copy_file(&source_path, &target_path), true);
+    
+    assert!(target_file.exists());
+    let copied_content = fs::read_to_string(&target_file).unwrap();
+    assert_eq!(copied_content, test_content);
+}
+
+#[test]
+fn test_copy_file_source_not_exists() {
+    let temp_dir = TempDir::new().unwrap();
+    
+    let source_file = temp_dir.path().join("nonexistent_file.txt");
+    let target_file = temp_dir.path().join("target_file.txt");
+    
+    let source_path = source_file.to_string_lossy();
+    let target_path = target_file.to_string_lossy();
+    
+    assert_eq!(copy_file(&source_path, &target_path), false);    
+    assert!(!target_file.exists());
+}
+
+#[test]
+fn test_copy_file_overwrite_existing() {
+    let temp_dir = TempDir::new().unwrap();
+    
+    let source_file = temp_dir.path().join("test_file.txt");
+    let new_content = "New content";
+    fs::write(&source_file, new_content).unwrap();
+    
+    let target_file = temp_dir.path().join("target_file.txt");
+    let old_content = "Old content";
+    fs::write(&target_file, old_content).unwrap();
+    
+    let source_path = source_file.to_string_lossy();
+    let target_path = target_file.to_string_lossy();
+    
+    assert_eq!(copy_file(&source_path, &target_path), true);
+    
+    let copied_content = fs::read_to_string(&target_file).unwrap();
+    assert_eq!(copied_content, new_content);
 }
