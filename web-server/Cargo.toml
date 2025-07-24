@@ -1,0 +1,11 @@
+[package]
+description = "A simple web server for Raspberry Pi for configuring stuff"
+name = "web-server"
+version = "0.1.0"
+edition = "2021"
+homepage = "https://github.com/vilmursss/raspberry-video-surveillance.git"
+repository = "https://github.com/vilmursss/raspberry-video-surveillance.git"
+
+[dependencies]
+tiny_http = "0.12"
+get_if_addrs = "0.5"
