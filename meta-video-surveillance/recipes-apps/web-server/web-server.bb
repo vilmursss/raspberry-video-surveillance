@@ -3,8 +3,8 @@ LICENSE = "CLOSED"
 
 inherit cargo
 
-SRC_URI = "file:///workdir/web-server"
-S = "${WORKDIR}/workdir/web-server"
+SRC_URI = "file://${VOLUME_WORKDIR}/web-server"
+S = "${WORKDIR}/${VOLUME_WORKDIR}/web-server"
 
 SRC_URI += " \
     crate://crates.io/ascii/1.1.0 \

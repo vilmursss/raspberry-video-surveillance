@@ -1,8 +1,8 @@
 SUMMARY = "Wifi connect utility tool"
 LICENSE = "CLOSED"
 
-SRC_URI = "file:///workdir/tools/wifi-connect"
-S = "${WORKDIR}/workdir/tools/wifi-connect"
+SRC_URI = "file://${VOLUME_WORKDIR}/tools/wifi-connect"
+S = "${WORKDIR}/${VOLUME_WORKDIR}/tools/wifi-connect"
 
 inherit cargo
 
