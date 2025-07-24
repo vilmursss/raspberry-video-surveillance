@@ -1,6 +1,7 @@
 use std::env;
 use std::path::Path;
-use wifi_connect::{verify_args, verify_usb_content, write_result_to_usb, copy_file, setup_wifi_connection, test_connectivity};
+use wifi_connect::{verify_args, verify_usb_content, write_result_to_usb, setup_wifi_connection, test_connectivity};
+use app_utils::copy_file;
 
 const WPA_SUPPLICANT_CONF_FILE: &str = "wpa_supplicant.conf";
 const WPA_SUPPLICANT_CONF_PATH: &str = "/etc/wpa_supplicant.conf";

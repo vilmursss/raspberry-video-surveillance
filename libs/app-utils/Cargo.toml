@@ -1,21 +1,16 @@
 [package]
-description = "A tool to connect to WiFi networks"
-name = "wifi-connect"
+name = "app-utils"
 version = "0.1.0"
 edition = "2021"
+description = "Common utility functions for Rust applications"
 homepage = "https://github.com/vilmursss/raspberry-video-surveillance.git"
 repository = "https://github.com/vilmursss/raspberry-video-surveillance.git"
 
 [lib]
-name = "wifi_connect"
+name = "app_utils"
 path = "src/lib.rs"
 
 [dependencies]
-app-utils = { path = "../../libs/app-utils" }
 
 [dev-dependencies]
 tempfile = "3.20.0"
-
-[[bin]]
-name = "wifi-connect"
-path = "src/main.rs"

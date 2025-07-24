@@ -1,12 +1,12 @@
 SUMMARY = "Wifi connect utility tool"
 LICENSE = "CLOSED"
 
-SRC_URI = "file://${VOLUME_WORKDIR}/tools/wifi-connect"
+SRC_URI = "file://${VOLUME_WORKDIR}/tools/wifi-connect \
+           file://${VOLUME_WORKDIR}/libs/app-utils"
+
 S = "${WORKDIR}/${VOLUME_WORKDIR}/tools/wifi-connect"
 
 inherit cargo
-
-CARGO_SRC_DIR = ""
 
 SRC_URI += " \
     crate://crates.io/bitflags/2.9.1 \
