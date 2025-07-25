@@ -28,7 +28,7 @@ pub fn verify_args(args: &[String]) -> bool {
 
 pub fn write_result_to_usb(mount_dir: &str, result: &str) -> bool {
     let path = Path::new(mount_dir);
-    let file_path = path.join("result.txt");
+    let file_path = path.join("wifi_connect_result.txt");
     write_str_to_file(file_path.to_str().unwrap_or(""), result)
 }
 
