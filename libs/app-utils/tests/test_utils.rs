@@ -1,6 +1,7 @@
 use std::fs;
 use tempfile::TempDir;
 use app_utils::{copy_file, write_str_to_file};
+use app_utils::network::get_interface_ip;
 
 #[cfg(test)]
 mod tests {
@@ -68,7 +69,6 @@ mod tests {
     }
 
 
-
     #[test]
     fn test_write_str_to_file_success() {
         let temp_dir = TempDir::new().unwrap();
@@ -108,5 +108,11 @@ mod tests {
 
         assert!(!result);
         assert!(!file_path.exists());
+    }
+
+    #[test]
+    fn test_get_interface_ip_empty_name() {
+        let result = get_interface_ip("");
+        assert!(result.is_none());
     }
 }

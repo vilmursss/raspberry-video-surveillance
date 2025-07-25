@@ -8,4 +8,4 @@ repository = "https://github.com/vilmursss/raspberry-video-surveillance.git"
 
 [dependencies]
 tiny_http = "0.12"
-get_if_addrs = "0.5"
+app-utils = { path = "../libs/app-utils" }

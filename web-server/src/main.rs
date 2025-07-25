@@ -1,26 +1,26 @@
 use std::fs::File;
 use std::io::Read;
 use tiny_http::{Server, Response, Request, StatusCode, Header};
-use get_if_addrs::{get_if_addrs, IfAddr};
+use app_utils::network::get_interface_ip;
+use app_utils::write_str_to_file;
 
 const HTML_DIR: &str = "/usr/share/web-server/html";
+const USB_MOUNT_PATH: &str = "/mnt/usb";
 
 fn main() {
-    let wlan_ip = get_if_addrs()
-        .unwrap()
-        .into_iter()
-        .find_map(|iface| {
-            if iface.name == "wlan0" {
-                if let IfAddr::V4(v4_addr) = iface.addr {
-                    Some(v4_addr.ip)
-                } else {
-                    None
-                }
-            } else {
-                None
+    let wlan_ip = match get_interface_ip("wlan0") {
+        Some(ip) => ip,
+        None => {
+            let error_msg = "Failed to retrieve wlan0 IP address";
+            eprintln!("{}", error_msg);
+
+            let error_file_path = format!("{}/web_server_error.txt", USB_MOUNT_PATH);
+            if !write_str_to_file(&error_file_path, error_msg) {
+                eprintln!("Failed to write error message to USB: {}", error_file_path);
             }
-        })
-        .expect("No wlan0 IPv4 address found!");
+            std::process::exit(1);
+        }
+    };
 
     // Bind to all interfaces to allow external connections
     let bind_addr = "0.0.0.0:8000";

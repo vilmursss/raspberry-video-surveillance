@@ -6,6 +6,8 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
+pub use get_if_addrs::{get_if_addrs, IfAddr};
+
 /// Copies a file from source to destination path
 ///
 /// # Arguments
@@ -69,4 +71,35 @@ pub fn write_str_to_file(file_path: &str, content: &str) -> bool {
         }
     }
     return true;
+}
+
+pub mod network {
+    use super::*;
+
+    /// Gets the IPv4 address of a specific network interface as a string
+    ///
+    /// # Arguments
+    ///
+    /// * `interface_name` - The name of the interface (e.g., "wlan0", "eth0")
+    ///
+    /// # Returns
+    ///
+    /// Returns `Some(String)` if the interface exists and has an IPv4 address,
+    /// `None` otherwise.
+    pub fn get_interface_ip(interface_name: &str) -> Option<String> {
+        get_if_addrs()
+            .ok()?
+            .into_iter()
+            .find_map(|iface| {
+                if iface.name == interface_name {
+                    if let IfAddr::V4(v4_addr) = iface.addr {
+                        Some(v4_addr.ip.to_string())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            })
+    }
 } 
