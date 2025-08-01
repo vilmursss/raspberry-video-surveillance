@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Video Surveillance Configuration</title>
+    <title>Raspberry Pi Camera</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <h1>Hello from Rust based web server!</h1>
+    <h1>Raspberry Pi Camera</h1>
+
+    <button id="streamButton" class="button">Watch Snapshot Stream</button>
+    <a href="/snapshot" target="_blank" class="button" style="background-color: #007bff;">View Single Snapshot</a>
+
+    <div id="videoContainer" class="video-container">
+        <h2>Live Snapshot Stream</h2>
+        <img id="streamImage" class="stream-image" alt="Camera Stream">
+        <div id="loadingStatus" class="status loading">Loading snapshot stream, please wait...</div>
+        <div id="errorStatus" class="status error">Failed to load snapshot stream.</div>
+    </div>
+    <script src="/script.js"></script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.video-container {
+    margin-top: 20px;
+    display: none;
+}
+
+video, .stream-image {
+    width: 100%;
+    max-width: 640px;
+    border: 1px solid #ddd;
+    display: none; /* Initially hidden */
+}
+
+/* Make sure the stream image is displayed when it has a src */
+.stream-image[src] {
+    display: block !important;
+}
+
+.status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.loading {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    display: none;
+} 
