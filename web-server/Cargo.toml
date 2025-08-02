@@ -9,3 +9,4 @@ repository = "https://github.com/vilmursss/raspberry-video-surveillance.git"
 [dependencies]
 tiny_http = "0.12"
 app-utils = { path = "../libs/app-utils" }
+os_pipe = "1.2.2"

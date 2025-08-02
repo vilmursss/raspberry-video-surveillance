@@ -3,18 +3,20 @@
 <head>
     <title>Raspberry Pi Camera</title>
     <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10"></script>
 </head>
 <body>
     <h1>Raspberry Pi Camera</h1>
 
-    <button id="streamButton" class="button">Watch Snapshot Stream</button>
-    <a href="/snapshot" target="_blank" class="button" style="background-color: #007bff;">View Single Snapshot</a>
+    <div class="button-container">
+        <button id="streamButton" class="button">Start Stream</button>
+    </div>
 
     <div id="videoContainer" class="video-container">
-        <h2>Live Snapshot Stream</h2>
-        <img id="streamImage" class="stream-image" alt="Camera Stream">
-        <div id="loadingStatus" class="status loading">Loading snapshot stream, please wait...</div>
-        <div id="errorStatus" class="status error">Failed to load snapshot stream.</div>
+        <h2>Live Camera Stream</h2>
+        <video id="videoPlayer" class="video-player" controls autoplay muted></video>
+        <div id="loadingStatus" class="status loading">Loading stream, please wait...</div>
+        <div id="errorStatus" class="status error">Failed to load stream.</div>
     </div>
     <script src="/script.js"></script>
 </body>

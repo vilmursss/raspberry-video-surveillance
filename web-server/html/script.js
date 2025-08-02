@@ -1,21 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
     const streamButton = document.getElementById('streamButton');
     const videoContainer = document.getElementById('videoContainer');
-    const streamImage = document.getElementById('streamImage');
+    const videoPlayer = document.getElementById('videoPlayer');
     const loadingStatus = document.getElementById('loadingStatus');
     const errorStatus = document.getElementById('errorStatus');
 
     let isStreaming = false;
-    let streamInterval = null;
+    let hls = null;
 
     streamButton.addEventListener('click', function() {
         if (isStreaming) {
             stopStreaming();
-            streamButton.textContent = 'Watch Snapshot Stream';
+            streamButton.textContent = 'Start Stream';
             videoContainer.style.display = 'none';
         } else {
             startStreaming();
-            streamButton.textContent = 'Stop Snapshot Stream';
         }
     });
 
@@ -23,95 +22,123 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Starting streaming...");
 
         videoContainer.style.display = 'block';
+        loadingStatus.textContent = "Starting camera stream...";
         loadingStatus.style.display = 'block';
         errorStatus.style.display = 'none';
-        streamImage.style.display = 'none';
+        videoPlayer.style.display = 'none';
 
-        isStreaming = true;
-
-        requestFrame();
+        // First, start the stream on the server
+        fetch('/start-stream', {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache'
+            },
+            timeout: 15000
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to start stream, status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {            
+            loadingStatus.textContent = "Initializing video stream...";
+            setTimeout(() => {
+                initializeHlsPlayer();
+            }, 5000);
+            
+            streamButton.textContent = 'Stop Stream';
+            isStreaming = true;
+        })
+        .catch(error => {
+            errorStatus.textContent = "Error starting stream: " + error.message;
+            errorStatus.style.display = 'block';
+            loadingStatus.style.display = 'none';
+        });
     }
 
+    function initializeHlsPlayer() {
+        if (hls) {
+            hls.destroy();
+            hls = null;
+        }
+
+        if (!Hls.isSupported()) {
+            errorStatus.textContent = "HLS is not supported by your browser";
+            errorStatus.style.display = 'block';
+            loadingStatus.style.display = 'none';
+            return;
+        }   
+
+        hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: false,
+            backBufferLength: 30,
+            liveSyncDuration: 6,
+            liveMaxLatencyDuration: 10,
+            liveDurationInfinity: true,
+
+            xhrSetup: function(xhr, url) {
+                // Extract segment number from URL
+                const segmentMatch = url.match(/segment_(\d+)\.ts/);
+                if (segmentMatch) {
+                    if (url.includes('http://')) {
+                        const segmentFile = 'segment_' + segmentMatch[1] + '.ts';
+                        const newUrl = '/' + segmentFile;
+                        xhr.open('GET', newUrl, true);
+                    }
+                    else if (!url.startsWith('/')) {
+                        const newUrl = '/' + url;
+                        xhr.open('GET', newUrl, true);
+                    }
+                }
+            }
+        });
+
+        // Add a timestamp to avoid caching
+        const timestamp = new Date().getTime();
+        const streamUrl = `/stream.m3u8?t=${timestamp}`;
+
+        // Add event listeners before loading the source
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            videoPlayer.play()
+                .then(() => {
+                    loadingStatus.style.display = 'none';
+                    videoPlayer.style.display = 'block';
+                })
+                .catch(e => {
+                    errorStatus.textContent = "Error starting playback. Please try again.";
+                    errorStatus.style.display = 'block';
+                    loadingStatus.style.display = 'none';
+                });
+        });
+        
+        hls.loadSource(streamUrl);
+        hls.attachMedia(videoPlayer);
+    }
     function stopStreaming() {
         console.log("Stopping streaming...");
-        isStreaming = false;
-
-        if (streamInterval) {
-            clearTimeout(streamInterval);
-            streamInterval = null;
+        
+        if (hls) {
+            hls.destroy();
+            hls = null;
         }
-    }
-
-    function requestFrame() {
-        if (!isStreaming) {
-            console.log("Not streaming, skipping frame request");
-            return;
-        }
-
-        loadFrame().then(success => {
-            if (success && isStreaming) {
-                requestFrame();
-            } else if (isStreaming) {
-                console.log("Frame failed to load, retrying in 1 second...");
-                streamInterval = setTimeout(requestFrame, 1000);
-            }
-        }).catch(error => {
-            console.error("Error loading frame:", error);
-            if (isStreaming) {
-                console.log("Error caught, retrying in 1 second...");
-                streamInterval = setTimeout(requestFrame, 1000);
-            }
-        });
-    }
-
-    function loadFrame() {
-        return new Promise((resolve, reject) => {
-            const timestamp = new Date().getTime();
-            const imageUrl = `/snapshot?t=${timestamp}`;
-
-            fetch(imageUrl, { 
-                method: 'GET',
-                cache: 'no-store',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-
-                streamImage.onload = function() {
-                    URL.revokeObjectURL(url);
-                    loadingStatus.style.display = 'none';
-                    errorStatus.style.display = 'none';
-                    streamImage.style.display = 'block';
-                    resolve(true);
-                };
-
-                streamImage.onerror = function() {
-                    URL.revokeObjectURL(url);
-                    loadingStatus.style.display = 'none';
-                    errorStatus.style.display = 'block';
-                    
-                    resolve(false);
-                };
-
-                streamImage.src = url;
+        
+        // Stop video playback
+        videoPlayer.pause();
+        videoPlayer.src = '';
+        videoPlayer.load();
+        
+        // Tell server to stop the stream
+        fetch('/stop-stream')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Stream stopped on server:", data);
             })
             .catch(error => {
-                console.error("Fetch error:", error);
-                loadingStatus.style.display = 'none';
-                errorStatus.style.display = 'block';
-                errorStatus.textContent = `Error: ${error.message}`;
-
-                resolve(false);
+                console.error("Error stopping stream:", error);
             });
-        });
+        
+        isStreaming = false;
     }
 }); 
