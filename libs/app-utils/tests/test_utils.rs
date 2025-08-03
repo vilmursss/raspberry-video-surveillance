@@ -1,6 +1,6 @@
 use std::fs;
 use tempfile::TempDir;
-use app_utils::{copy_file, write_str_to_file};
+use app_utils::{copy_file, write_str_to_file, add_content_to_file, WriteMode};
 use app_utils::network::get_interface_ip;
 
 #[cfg(test)]
@@ -114,5 +114,37 @@ mod tests {
     fn test_get_interface_ip_empty_name() {
         let result = get_interface_ip("");
         assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_append_str_to_file_success() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("test.txt");
+
+        fs::write(file_path.to_str().unwrap(), "Test content 1").unwrap();
+
+        let result = add_content_to_file(file_path.to_str().unwrap(), "Test content 2", WriteMode::Append);
+
+        assert!(result);
+        assert!(file_path.exists());
+
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert_eq!(content.trim(), "Test content 1\nTest content 2");
+    }
+
+    #[test]
+    fn test_prepend_str_to_file_success() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("test.txt");
+
+        fs::write(file_path.to_str().unwrap(), "Test content 1 ").unwrap();
+
+        let result = add_content_to_file(file_path.to_str().unwrap(), "Test content 2", WriteMode::Prepend);
+
+        assert!(result);
+        assert!(file_path.exists());
+
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert_eq!(content.trim(), "Test content 2\nTest content 1");
     }
 }

@@ -2,11 +2,22 @@
 //!
 //! Common utility functions for Rust applications.
 
-use std::fs::File;
+use std::fs::{File, read_to_string};
 use std::io::Write;
 use std::path::Path;
 
 pub use get_if_addrs::{get_if_addrs, IfAddr};
+
+/// Enum to specify the write mode for a file
+///
+/// # Variants
+///
+/// * `Append` - Appends the content to the file
+/// * `Prepend` - Prepends the content to the file
+pub enum WriteMode {
+    Append,
+    Prepend,
+}
 
 /// Copies a file from source to destination path
 ///
@@ -68,6 +79,38 @@ pub fn write_str_to_file(file_path: &str, content: &str) -> bool {
         Err(e) => {
             eprintln!("Failed to create file: {:?}", e);
             return false;
+        }
+    }
+    return true;
+}
+
+/// Adds content to a file, either appending or prepending. Creates the file if it doesn't exist.
+///
+/// # Arguments
+///
+/// * `file_path` - A string slice that holds the path to the file
+/// * `content` - A string slice containing the content to add to the file
+/// * `write_mode` - Specifies whether to append or prepend the content
+///
+/// # Returns
+///
+/// Returns `true` if the content was added successfully, `false` otherwise.
+pub fn add_content_to_file(file_path: &str, content: &str, write_mode: WriteMode) -> bool {
+    let path = Path::new(file_path);
+    
+    // Read existing content if file exists, empty string otherwise
+    let existing_content = read_to_string(&path).unwrap_or_default();
+    
+    match write_mode {
+        WriteMode::Append => {
+            if !write_str_to_file(file_path, &format!("{}\n{}", existing_content, content)) {
+                return false;
+            }
+        },
+        WriteMode::Prepend => {
+            if !write_str_to_file(file_path, &format!("{}\n{}", content, existing_content)) {
+                return false;
+            }
         }
     }
     return true;

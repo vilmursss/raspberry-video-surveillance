@@ -61,7 +61,7 @@ fn test_write_result_to_usb_success() {
 
     assert_eq!(write_result_to_usb(&mount_dir, test_message), true);
 
-    let result_file = temp_dir.path().join("result.txt");
+    let result_file = temp_dir.path().join("wifi_connect_result.txt");
     assert!(result_file.exists());
 
     let mut file_content = String::new();
@@ -79,7 +79,7 @@ fn test_write_result_to_usb_overwrite_existing_file() {
     let mount_dir = temp_dir.path().to_string_lossy();
     
     // Create initial file with some content
-    let result_file = temp_dir.path().join("result.txt");
+    let result_file = temp_dir.path().join("wifi_connect_result.txt");
     fs::write(&result_file, "Initial content").unwrap();
 
     let new_message = "Overwritten content";

@@ -1,0 +1,12 @@
+[package]
+description = "A tool to detect movement using a PIR sensor"
+name = "movement-detector"
+version = "0.1.0"
+edition = "2021"
+homepage = "https://github.com/vilmursss/raspberry-video-surveillance.git"
+repository = "https://github.com/vilmursss/raspberry-video-surveillance.git"
+
+[dependencies]
+rppal = "0.14"
+app-utils = { path = "../../libs/app-utils" }
+chrono = "0.4.30"
